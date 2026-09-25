@@ -1,0 +1,183 @@
+void main() {
+  // Variables con tipo explicito.
+  String nombreCliente = 'Ana Lopez';
+  String tipoCliente = 'estudiante';
+  int numeroFactura = 1001;
+  bool compraFinalizada = false;
+  // Null safety.
+  String? correo;
+  String? cupon = 'UMES10';
+  // Constante.
+  const double porcentajeIva = 0.12;
+  // Final: se asigna una sola vez en tiempo de ejecucion.
+  final DateTime fechaCompra = DateTime.now();
+  // Inferencia de tipo.
+  var nombreTienda = 'Tienda Universitaria UMES';
+  // Dynamic: puede cambiar de tipo.
+  dynamic referenciaPago = 'PENDIENTE';
+  final productos = <Map<String, dynamic>>[
+    {
+      'nombre': 'Cuaderno',
+      'categoria': 'Papeleria',
+      'precio': 25.0,
+      'cantidad': 3,
+    },
+    {
+      'nombre': 'Memoria USB',
+      'categoria': 'Tecnologia',
+      'precio': 85.0,
+      'cantidad': 1,
+    },
+    {
+      'nombre': 'Libro de Dart',
+      'categoria': 'Libros',
+      'precio': 120.0,
+      'cantidad': 2,
+    },
+  ];
+  const cupones = <String, double>{
+    'UMES10': 0.10,
+    'LIBRO5': 0.05,
+    'DOCENTE15': 0.15,
+  };
+
+  // TODO 1: mostrar los productos.
+
+  void mostrarProductos(List<Map<String, dynamic>> listaDeProductos) {
+    print('****PRODUCTOS****');
+
+    for (var producto in listaDeProductos) {
+      print(
+        '${producto['nombre']} - ${producto['cantidad']} x Q${producto['precio'].toStringAsFixed(2)} = Q${(producto['precio'] * producto['cantidad']).toStringAsFixed(2)}',
+      );
+    }
+    print('---------------------------------------');
+  }
+
+  mostrarProductos(productos);
+
+  // TODO 2: calcular el subtotal.
+  double calcularSubtotal(List<Map<String, dynamic>> listaDeProductos) {
+    double subtotal = 0;
+    for (var producto in listaDeProductos) {
+      subtotal += producto['cantidad'] * producto['precio'];
+    }
+
+    return subtotal;
+  }
+
+  double subtotal = calcularSubtotal(productos);
+
+  double obtenerDescuentoCliente(String tipoCliente) {
+    double descuento = 0;
+    switch (tipoCliente.toLowerCase()) {
+      case 'estudiante':
+        descuento = 0.08;
+        break;
+      case 'docente':
+        descuento = 0.12;
+        break;
+      case 'visitante':
+        descuento = 0;
+        break;
+      default:
+        descuento = 0;
+        break;
+    }
+    return descuento;
+  }
+
+  double descuentoCliente = obtenerDescuentoCliente(tipoCliente);
+
+  //todo 4 obtener el descuento del cupon aplicando null safety.
+  double descuentoCupon = cupones[cupon] ?? 0.0;
+
+  // TODO 5: calcular el porcentaje total de descuento.
+  double porcentajeDescuento = descuentoCliente + descuentoCupon;
+  
+  if (porcentajeDescuento > 0.25) {
+ porcentajeDescuento = 0.25;
+}
+  // TODO 6: calcular el valor monetario del descuento.
+  double valorDescuento = subtotal * porcentajeDescuento;
+
+  // TODO 7: calcular el subtotal despues del descuento.
+ double subtotalConDescuento = subtotal - valorDescuento;
+  
+ // TODO 8: calcular el IVA.
+ double impuesto = subtotalConDescuento * porcentajeIva;
+  
+   // TODO 9: llamar a calcularTotal con parametros nombrados.
+ double calcularTotal({
+ required double subtotal,
+ required double porcentajeDescuento,
+ required double porcentajeIva,
+}) {
+ // TODO: aplicar descuento e IVA.
+   double subtotalDesc = subtotal-(subtotal*(porcentajeDescuento));
+   double total = subtotalDesc+(subtotalDesc*porcentajeIva);
+   
+ return total;
+ }
+ double total = calcularTotal(subtotal:subtotal, porcentajeDescuento:porcentajeDescuento, porcentajeIva:porcentajeIva);
+
+// El dato dynamic cambia de String a int.
+ referenciaPago = 45892;
+ compraFinalizada = true;
+
+   // TODO 10: obtener categorias sin repetir usando Set.
+final categorias = {
+  for (var producto in productos) producto['categoria'] as String
+};
+
+  void mostrarFactura({
+ required int numeroFactura,
+ required String cliente,
+ String? correo,
+ String? cupon,
+ required double subtotal,
+ required double descuento,
+ required double impuesto,
+ required double total,
+}) {
+ print('\nFACTURA No. $numeroFactura');
+ print('Cliente: $cliente');
+ // Null safety mediante el operador ??.
+ print('Correo: ${correo ?? 'No registrado'}');
+ print('Cupon: ${cupon ?? 'Sin cupon'}');
+ print('Subtotal: Q${subtotal.toStringAsFixed(2)}');
+ print('Descuento: Q${descuento.toStringAsFixed(2)}');
+ print('IVA: Q${impuesto.toStringAsFixed(2)}');
+ print('Total: Q${total.toStringAsFixed(2)}');
+}
+
+// TODO 11: mostrar la factura.
+ mostrarFactura(
+ numeroFactura: numeroFactura,
+ cliente: nombreCliente,
+ correo: correo,
+ cupon: cupon,
+ subtotal: subtotal,
+ descuento: valorDescuento,
+ impuesto: impuesto,
+ total: total,
+ );
+
+ print('Tienda: $nombreTienda');
+ print('Fecha: $fechaCompra');
+ print('Referencia: $referenciaPago');
+ print('Compra finalizada: $compraFinalizada');
+ print('Categorias: $categorias');
+ 
+  // TODO 12: usar if para mostrar un mensaje especial.
+  if (cupon == null) {
+    print('Mensaje: No se proporcionó ningún cupón.');
+  } else if (!cupones.containsKey(cupon)) {
+    print('Mensaje: El cupón "$cupon" no existe.');
+  } else if (subtotal <= 300) {
+    print('Mensaje: El cupón "$cupon" es válido, pero la compra no supera los Q300.00.');
+  } else {
+    descuentoCupon = cupones[cupon]!;
+    print('Mensaje: ¡Cupón "$cupon" aplicado exitosamente!');
+  }
+}
